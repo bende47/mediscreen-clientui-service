@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Home</title>
+<link href="../../fonts/font.css" rel="stylesheet">
+<link href="../../css/bootstrap.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-6">
+				<a href="/patient/list">Patient List</a>&nbsp;|&nbsp; 
+				<a href="/rapport/list">Generation de rapport</a>
+			</div>
+			<div class="col-6 text-right">
+				Logged in user: <b th:inline="text" class="user">
+					[[${#httpServletRequest.remoteUser}]] </b>
+				<form th:action="@{/app-logout}" method="POST">
+					<input type="submit" value="Logout" />
+				</form>
+			</div>
+		</div>
+		
+		<div class="container">
+
+                <div class="resume" style="margin-right:  180px;">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+                            <div class="panel panel-default">
+                                <div class="panel-heading resume-heading">
+                                    <div class="row">
+                                        <div class="col-lg-12" >
+                                            <div class="col-xs-12 col-sm-4">
+                                                <figure>
+                                                    <img class="img-responsive img-circle" style="height: 200px;width: 200px" alt="" src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120">
+                                                </figure>                                                
+
+                                            </div>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item"><p style="font-weight: bold" th:text="'Name :  ' + |${patientBean.name} ${patientBean.firstname}|"></p></li>
+                                                    <li class="list-group-item"> <p  style="font-weight: bold" th:text="'Birthday :  ' + ${patientBean.birthday} "></p></li> 
+                                                    <li class="list-group-item"> <p style="font-weight: bold"  th:text="'Address :  ' + ${patientBean.address} "></p></li> 
+                                                    <li class="list-group-item"><p  style="font-weight: bold" th:text="'Phone :  ' + ${patientBean.phone} "></p></li> 
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+		<div class="row" style="margin-top: 15px">
+			<a th:href="@{'/historique/add/' + ${patientBean.id}}" class="btn btn-primary btn-sm">Ajouter Historique</a>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Notes/Observations</th>						
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="history : ${historyBean}">
+						<td style="width: 15%" th:text="${#dates.format(history.dateCreation, 'dd-MM-yyyy HH:mm')}"></td>
+						<td th:text="${history.notes}"></td>
+						<td style="width: 15%" class="text-center"><a
+							class="btn btn-primary"
+							th:href="@{/historique/update/{id}(id=${history.id})}"> <span
+								class="glyphicon glyphicon-pencil
+						"></span></a></td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+		
+	<script type="text/javascript" src="../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../js/bootstrap.js"></script>
+</body>
+</html>

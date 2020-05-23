@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Home</title>
+<link href="../../fonts/font.css" rel="stylesheet">
+<link href="../../css/bootstrap.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-6">
+				<a href="/patient/list">Patient List</a>&nbsp;|&nbsp; <a
+					href="/historique/list">Historique Patient</a>&nbsp;|&nbsp; <a
+					href="/rapport/list">Generation de rapport</a>
+			</div>
+			<div class="col-6 text-right">
+				Logged in user: <b th:inline="text" class="user">
+					[[${#httpServletRequest.remoteUser}]] </b>
+				<form th:action="@{/app-logout}" method="POST">
+					<input type="submit" value="Logout" />
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<h2>Patient</h2>
+		</div>
+		<div class="row" style="margin-top: 15px">
+			<a href="/patient/add" class="btn btn-primary btn-sm">Ajouter Patient</a>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Sex</th>
+						<th>Birthday</th>
+						<th>Address</th>
+						<th>Phone</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="patient : ${patients}">
+						<td th:text="${patient.firstname} "></td>
+						<td th:text="${patient.sex}"></td>
+						<td th:text="${#dates.format(patient.birthday,'dd-MM-yyyy')}"></td>
+						<td th:text="${patient.address}"></td>
+						<td th:text="${patient.phone}"></td>
+						<td style="width: 15%" class="text-center"><a
+							class="btn btn-primary"
+							th:href="@{/patient/update/{id}(id=${patient.id})}"> <span
+								class="glyphicon glyphicon-pencil
+						"></span></a>&nbsp;&nbsp; <a
+							class="btn btn-danger"
+							th:href="@{/patient/delete/{id}(id=${patient.id})}"><span
+								class="glyphicon glyphicon-trash
+						"></span></a></td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../js/bootstrap.js"></script>
+</body>
+</html>
