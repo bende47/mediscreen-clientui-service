@@ -1,5 +1,9 @@
 package com.mediscreen.controller;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -12,11 +16,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mediscreen.beans.DeclencheursBean;
 import com.mediscreen.beans.HistoryBean;
 import com.mediscreen.beans.PatientBean;
+import com.mediscreen.beans.RapportBean;
 import com.mediscreen.proxies.HistoryProxy;
 import com.mediscreen.proxies.PatientProxy;
+import com.mediscreen.proxies.RapportProxy;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @CrossOrigin("*")
 @RestController
 public class ClientUIController {
@@ -26,6 +36,9 @@ public class ClientUIController {
 	
 	@Autowired
 	HistoryProxy historyProxy;
+	
+	@Autowired
+	RapportProxy rapportProxy;
 	
 	@PostMapping("/patient/add")
 	public PatientBean add(@RequestBody PatientBean patient) {
@@ -73,10 +86,95 @@ public class ClientUIController {
 	}
 	
 	@PostMapping(value = "rapport/stat")
-	public String rapport(@RequestBody PatientBean patient)  {		
-		System.out.println(patient);
-		return "";
+	public RapportBean rapport(@RequestBody PatientBean patient)  {		
+
+		LocalDate localDate = patient.getBirthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
+		int age = determineAge(localDate);
+		
+		List<HistoryBean> listHistoriquePatient = new ArrayList<HistoryBean>();
+		
+		listHistoriquePatient = historyProxy.allHistoryPatient(patient.getId());
+		
+		List<DeclencheursBean> listDecl = new ArrayList<DeclencheursBean>();
+		listDecl = rapportProxy.allDeclencheurs();
+		
+		int cpt = 0;
+		
+		for (HistoryBean histBean : listHistoriquePatient) {			
+			for (DeclencheursBean decl : listDecl) {
+				 if(histBean.getNotes().contains(decl.getLibelle())) {
+					 cpt++;
+				 }
+			}			
+		}
+		
+		String risque = "";
+
+		if(cpt==0) {
+			risque = "Aucun risque";
+		}
+		
+		if(age > 30) {
+			
+			if(cpt==2) {
+				risque = "Risque limite";	
+			}
+			
+			if(cpt==6) {
+				risque = "Danger";
+			}
+			
+			if(cpt>= 8) {
+				risque = "Apparition precoce";
+			}
+			
+		}else {
+			if("M".equals(patient.getSex())) {
+				if(cpt==3) {
+					risque = "Danger";
+				}
+				if(cpt==5) {
+					risque = "Apparition precoce";
+				}
+			}else {
+				if(cpt==4) {
+					risque = "Danger";
+				}
+				if(cpt==7) {
+					risque = "Apparition precoce";
+				}
+			}
+		}
+		
+		if(!risque.equals("")) {
+			rapportProxy.addRapport(patient.getId(),age,risque);
+		}
+		
+
+		
+		log.info("Age =" +age);
+		log.info("Risque =" + risque);
+		log.info("Patient = " +patient.getId());
+		log.info("Compte = " +cpt);
+		return rapportProxy.findRapport(patient.getId());
 	}
 	
+	
+	@SuppressWarnings("static-access")
+	public int determineAge(LocalDate date) {
+		 Calendar calendar = Calendar.getInstance();
+
+		int annee=date.getYear();
+		int calannee=calendar.get(Calendar.YEAR)-annee;
+		
+		int mois=date.getMonthValue();
+		int calmois=calendar.MONTH - mois;			
+
+		if (calmois >= 0) {
+			return calannee;
+		} else {
+			return calannee - 1;
+		}
+	}
 	
 }
