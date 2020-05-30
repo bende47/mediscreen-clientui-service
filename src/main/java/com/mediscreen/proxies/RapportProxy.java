@@ -15,9 +15,6 @@ public interface RapportProxy {
 	@GetMapping(value="addRapport/add/{idPatient}/{age}/{risques}")
 	RapportBean addRapport(@PathVariable("idPatient") String idPatient,@PathVariable("age") int age,@PathVariable("risques") String risques);
 	
-	@GetMapping(value="rapport/all/{id}")
-	List<RapportBean> all(@PathVariable("id") String id); 
-	
 	@GetMapping(value="declencheur/all")
 	public List<DeclencheursBean> allDeclencheurs();
 	
