@@ -107,12 +107,10 @@ public class ClientUIController {
 				 }
 			}			
 		}
-		
-		String risque = "";
+		log.info("Compte = " +cpt);
 
-		if(cpt==0) {
-			risque = "Aucun risque";
-		}
+		String risque = "Aucun risque";
+		
 		
 		if(age > 30) {
 			
@@ -155,7 +153,6 @@ public class ClientUIController {
 		log.info("Age =" +age);
 		log.info("Risque =" + risque);
 		log.info("Patient = " +patient.getId());
-		log.info("Compte = " +cpt);
 		return rapportProxy.findRapport(patient.getId());
 	}
 	
